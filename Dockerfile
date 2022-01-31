@@ -7,6 +7,7 @@ FROM swift:5.3-focal as build
 RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
     && apt-get -q update \
     && apt-get -q dist-upgrade -y \
+    && apt-get install valgrind -y \	
     && rm -rf /var/lib/apt/lists/*
 
 # Set up a build area
@@ -23,7 +24,7 @@ RUN swift package resolve
 COPY . .
 
 # Build everything, with optimizations and test discovery
-RUN swift build --enable-test-discovery -c release
+RUN valgrind -v swift build --enable-test-discovery -c release
 
 # Switch to the staging area
 WORKDIR /staging
